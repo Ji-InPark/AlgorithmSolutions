@@ -19,7 +19,7 @@ public class Main {
             set.add(Integer.parseInt(input));
         }
 
-        var arr = new int[n + 1];
+        var arr = new int[n + 2];
         int max = n + 1;
 
         for (int i = n; i > 0; i--) {
@@ -43,11 +43,21 @@ public class Main {
 
     private static int findNum(int[] arr, int index) {
         if (arr[index] < 0) {
-            return findNum(arr, -arr[index]);
+            if (arr[-arr[index]] < 0) {
+                return findNum(arr, -arr[index]);
+            }
+
+            arr[-arr[index]] *= -1;
+
+            return -arr[index];
+        } else {
+            if (arr[arr[index]] < 0) {
+                return findNum(arr, arr[index]);
+            }
+
+            arr[arr[index]] *= -1;
+
+            return arr[index];
         }
-
-        arr[index] *= -1;
-
-        return -arr[index];
     }
 }
