@@ -6,7 +6,7 @@ import java.io.OutputStreamWriter;
 
 public class Main {
 
-    static int n;
+    static int n, result = Integer.MAX_VALUE;
 
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -25,35 +25,10 @@ public class Main {
             endArr[i] = endInput.charAt(i - 1) == '1';
         }
 
-        int result = Integer.MAX_VALUE, count;
-
-        System.arraycopy(originArr, 0, startArr, 0, n + 2);
-        count = getCount(startArr, endArr, originArr, 0);
-        if (isSame(startArr, endArr)) {
-            result = count;
-        }
-
-        System.arraycopy(originArr, 0, startArr, 0, n + 2);
-        flip(startArr, 1);
-        count = getCount(startArr, endArr, originArr, 1);
-        if (isSame(startArr, endArr)) {
-            result = Math.min(result, count);
-        }
-
-        System.arraycopy(originArr, 0, startArr, 0, n + 2);
-        flip(startArr, n);
-        count = getCount(startArr, endArr, originArr, 1);
-        if (isSame(startArr, endArr)) {
-            result = Math.min(result, count);
-        }
-
-        System.arraycopy(originArr, 0, startArr, 0, n + 2);
-        flip(startArr, 1);
-        flip(startArr, n);
-        count = getCount(startArr, endArr, originArr, 2);
-        if (isSame(startArr, endArr)) {
-            result = Math.min(result, count);
-        }
+        getCount(startArr, endArr, originArr, new int[]{});
+        getCount(startArr, endArr, originArr, new int[]{1});
+        getCount(startArr, endArr, originArr, new int[]{n});
+        getCount(startArr, endArr, originArr, new int[]{1, n});
 
         if (result == Integer.MAX_VALUE) {
             result = -1;
@@ -63,7 +38,13 @@ public class Main {
         bw.flush();
     }
 
-    private static int getCount(boolean[] startArr, boolean[] endArr, boolean[] originArr, int count) {
+    private static void getCount(boolean[] startArr, boolean[] endArr, boolean[] originArr, int[] indexes) {
+        System.arraycopy(originArr, 0, startArr, 0, n + 2);
+        for (var index : indexes) {
+            flip(startArr, index);
+        }
+
+        int count = indexes.length;
         for (int i = 2; i < n; i++) {
             if (startArr[i - 1] != endArr[i - 1]) {
                 flip(startArr, i);
@@ -71,7 +52,9 @@ public class Main {
             }
         }
 
-        return count;
+        if (isSame(startArr, endArr)) {
+            result = Math.min(result, count);
+        }
     }
 
     private static void flip(boolean[] arr, int index) {
