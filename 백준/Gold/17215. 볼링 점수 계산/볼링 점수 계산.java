@@ -17,35 +17,23 @@ public class Main {
         var frames = new int[10];
 
         var bonusMap = new HashMap<Integer, ArrayList<Integer>>();
-
         int index = 0;
 
-        for (int i = 0; i < 9; i++) {
-            var c = input.charAt(index);
+        for (int currentFrame = 0; currentFrame < 9; currentFrame++) {
+            var pins = input.charAt(index);
             int sum = 0;
 
-            if (c == 'S') {
-                frames[i] = 10;
+            if (isStrike(pins)) {
+                frames[currentFrame] = 10;
 
                 calculateBonusFrame(bonusMap, index, frames, 10);
-
-                for (int j = 1; j <= 2; j++) {
-                    int key = index + j;
-
-                    if (!bonusMap.containsKey(key)) {
-                        bonusMap.put(key, new ArrayList<>());
-                    }
-
-                    bonusMap.get(key).add(i);
-                }
+                addBonusFrame(bonusMap, index, currentFrame, 2);
 
                 index++;
 
                 continue;
-            }
-
-            if (c != '-') {
-                var score = c - '0';
+            } else if (isNotZero(pins)) {
+                var score = pins - '0';
                 sum += score;
 
                 calculateBonusFrame(bonusMap, index, frames, score);
@@ -53,49 +41,43 @@ public class Main {
 
             index++;
 
-            c = input.charAt(index);
+            pins = input.charAt(index);
 
-            if (c == 'P') {
+            if (isSpare(pins)) {
                 var score = 10 - sum;
                 sum = 10;
 
                 calculateBonusFrame(bonusMap, index, frames, score);
-
-                var key = index + 1;
-                if (!bonusMap.containsKey(key)) {
-                    bonusMap.put(key, new ArrayList<>());
-                }
-
-                bonusMap.get(key).add(i);
-            } else if (c != '-') {
-                var score = c - '0';
+                addBonusFrame(bonusMap, index, currentFrame, 1);
+            } else if (isNotZero(pins)) {
+                var score = pins - '0';
                 sum += score;
 
                 calculateBonusFrame(bonusMap, index, frames, score);
             }
 
-            frames[i] = sum;
+            frames[currentFrame] = sum;
 
             index++;
         }
 
-        int prev = 0;
+        int prevScore = 0;
         while (index < input.length()) {
-            var c = input.charAt(index);
+            var pins = input.charAt(index);
             int score = 0;
 
-            if (c == 'S') {
+            if (isStrike(pins)) {
                 score = 10;
-            } else if (c == 'P') {
-                score = 10 - prev;
-            } else if (c != '-') {
-                score = c - '0';
+            } else if (isSpare(pins)) {
+                score = 10 - prevScore;
+            } else if (isNotZero(pins)) {
+                score = pins - '0';
             }
 
             calculateBonusFrame(bonusMap, index, frames, score);
 
             frames[9] += score;
-            prev = score;
+            prevScore = score;
 
             index++;
         }
@@ -109,6 +91,18 @@ public class Main {
         bw.flush();
     }
 
+    private static void addBonusFrame(HashMap<Integer, ArrayList<Integer>> bonusMap, int index, int frame, int count) {
+        for (int i = 1; i <= count; i++) {
+            int key = index + i;
+
+            if (!bonusMap.containsKey(key)) {
+                bonusMap.put(key, new ArrayList<>());
+            }
+
+            bonusMap.get(key).add(frame);
+        }
+    }
+
     private static void calculateBonusFrame(HashMap<Integer, ArrayList<Integer>> bonusMap, int index,
             int[] frames, int score) {
         var bonusFrames = bonusMap.getOrDefault(index, new ArrayList<>());
@@ -116,6 +110,18 @@ public class Main {
         for (var bonusFrame : bonusFrames) {
             frames[bonusFrame] += score;
         }
+    }
+
+    private static boolean isStrike(char c) {
+        return c == 'S';
+    }
+
+    private static boolean isSpare(char c) {
+        return c == 'P';
+    }
+
+    private static boolean isNotZero(char c) {
+        return c != '-';
     }
 }
 
