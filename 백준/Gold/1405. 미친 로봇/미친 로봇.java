@@ -26,25 +26,19 @@ public class Main {
             arr[i] = Integer.parseInt(inputs[i + 1]);
         }
 
-        solve(50, 50, 0, new int[n]);
+        solve(50, 50, 0, 1d);
 
         bw.write(new BigDecimal(result) + "\n");
         bw.flush();
     }
 
-    private static void solve(int y, int x, int index, int[] dirs) {
+    private static void solve(int y, int x, int index, double probability) {
         if (visited[y][x]) {
             return;
         }
 
         if (index == n) {
-            var probability = 1d;
-            for (var dir : dirs) {
-                probability *= (arr[dir] / 100d);
-            }
-
             result += probability;
-
             return;
         }
 
@@ -56,8 +50,7 @@ public class Main {
                 continue;
             }
 
-            dirs[index] = i;
-            solve(ny, nx, index + 1, dirs);
+            solve(ny, nx, index + 1, probability * ((double) arr[i] / 100d));
         }
         visited[y][x] = false;
     }
